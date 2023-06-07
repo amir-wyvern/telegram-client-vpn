@@ -1,0 +1,2 @@
+1401= Incorrect username or password
+1002= THis position not exist in the manager list {class name}
