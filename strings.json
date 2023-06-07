@@ -4,11 +4,27 @@
         "login_username": "برای استفاده از ربات باید لاگین کنی\n\nنام کاربری خودتو برام ارسال کن:",
         "login_password": "لطفا پسورد رو هم بفرست ",
         "login_success": "شما وارد ربات شدین و میتونین از خدماتش استفاده کنید",
-        "login_failed": "نام کاربری یا پسوردی که ارسال کردین اشتباهه\nلطفا دوباره امتحان کنید"
+        "login_failed": "نام کاربری یا پسوردی که ارسال کردین اشتباهه\nلطفا دوباره امتحان کنید",
+        "internal_error": "مشکلی پیش اومده لطفا بعدا تلاش کنید",
+        "select_number_newconfig": "تعداد کانفیگ مورد نظر را مشخص کن\nتعداد : {0}",
+        "menu": "menuuuuu"
 
     },
     "button":{
-
+        "edit_password": "ویرایش پسورد"
+    },
+    "callback_text": {
+        "new_config": "کانفیگ جدید",
+        "manage_users": "مدیرییت کاربران",
+        "support": "پشتیبانی",
+        "financial": "مالی",
+        "increase_number_config": "+",
+        "decrease_number_config": "-",
+        "submit": "تایید",
+        "back": "بازگشت"
+    },
+    "callback_url": {
+        "support": "https://t.me/xwyvern"
     },
     "command": {
 
