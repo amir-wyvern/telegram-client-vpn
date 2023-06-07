@@ -34,11 +34,10 @@ def set_session(chat_id, session, db: redis.Redis):
 
 def get_session(chat_id, db: redis.Redis):
 
-    data = db.hget(f'tel:agent:{chat_id}', db) 
-    
-    if data and 'session' in data:
+    session = db.hget(f'tel:agent:{chat_id}', 'session') 
+    if session :
 
-        return data['session']
+        return session
 
     return None
 
@@ -47,15 +46,20 @@ def set_position(chat_id, pos, db:redis.Redis):
     db.hset(f'tel:agent:{chat_id}', 'pos', pos)
     return pos
 
-def get_position(chat_id, pos, db:redis.Redis):
+def get_position(chat_id, db:redis.Redis):
 
-    db.hset(f'tel:agent:{chat_id}', 'pos')
+    pos =db.hget(f'tel:agent:{chat_id}', 'pos')
     return pos
 
 def set_cache(chat_id, data, db:redis.Redis):
 
-    db.hset(f'tel:agent:{chat_id}', 'cache', json.dumps(data))
+    x = db.hset(f'tel:agent:{chat_id}', 'cache', json.dumps(data))
     return data
+
+def delete_cache(chat_id, db:redis.Redis):
+
+    db.hset(f'tel:agent:{chat_id}', 'cache', json.dumps({}))
+    return True
 
 def get_cache(chat_id, db:redis.Redis):
 
