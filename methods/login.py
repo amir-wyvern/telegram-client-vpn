@@ -13,6 +13,8 @@ from cache.cache_session import (
 from utils.db_cache import db_cache
 from utils.exception import HTTPException
 from api.auth import login
+from methods.menu import MenuManager
+
 
 class LoginManager:
 
@@ -91,20 +93,23 @@ class LoginManager:
         cache = get_cache(chat_id, db)
 
         resp = login(cache['username'], cache['password'])
-        print('resp')
+
         if resp.status_code == 1401:
-            options = InlineKeyboardMarkup([
-                InlineKeyboardButton(loadStrings.button.edit_password, 'edit_password')
-                ], resize_keyboard=True)
+            options = InlineKeyboardMarkup([[
+                InlineKeyboardButton(loadStrings.button.edit_password, callback_data='edit_password')
+                ]])
             
-            await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.login_failed, reply_markup=options)
+            await  context.bot.send_message(chat_id= chat_id, text= loadStrings.text.login_failed, reply_markup=options)
+            return 
 
         if resp.status_code != 200:
             await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.internal_error)
-
+            return 
+        
         set_session(chat_id, resp.json()['access_token'], db)
         set_position(chat_id, 'mainmenu', db)
         delete_cache(chat_id, db)
-        await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.login_success)
+
+        await MenuManager().manager(update, context)
         # link to main menu
 
