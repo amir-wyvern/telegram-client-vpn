@@ -7,8 +7,22 @@
         "login_failed": "نام کاربری یا پسوردی که ارسال کردین اشتباهه\nلطفا دوباره امتحان کنید",
         "internal_error": "مشکلی پیش اومده لطفا بعدا تلاش کنید",
         "select_number_newconfig": "تعداد کانفیگ مورد نظر را مشخص کن\nتعداد : {0}",
-        "menu": "menuuuuu"
-
+        "menu": "menuuuuu",
+        "max_config": "بین ۱ تا ۵ تا میتونی انتخاب کنی",
+        "zero_number_config": "حداقل بایستی یک عدد کانفیگ درخواست بدین",
+        "config_text": "host: `{0}`\nport: `{1}`\nusername: `{2}`\npassword: `{3}`",
+        "error_config": "خطا در ساخت کانفیگ, لطفا دوباره تلاش کنین یا با پشتیبانی تماس بگیرین",
+        "renew_config_text": "نام کاربر مورد نظر رو برام بفرست",
+        "update_expire_get_username_text": "نام کاربر مورد نظر رو برای تمدید برام بفرست",
+        "renew_config_resp": "host: `{0}` \nport: `{1}` \nusername: *{2}*\npassword: *{3}*",
+        "error_username_not_have_service": "این نام کابری هیچ کانفیگی نداره",
+        "error_service_deleted": "این کانفیگ قبلا حذف شده است",
+        "error_not_agent": "شما نماینده این نام کاربری نیستین و کسی دیگری این کانفیگ رو ایجاد کرده است",
+        "error_not_exist_any_interface": "در حال حاضر هیچ آیپی خالی وجود نداره",
+        "expire_day_text": "تغییر زمان انقضا به تاریخ [{0}]",
+        "empty_day_field": "شما تغییری در تاریخ اعمال نکردین",
+        "insufficient_balance": "موجودی شما برای تمدید این کانفیگ کافی نیست",
+        "update_expire_success": "نام کاربری `{0}` تا تاریخ *{1}* تمدید شد"
     },
     "button":{
         "edit_password": "ویرایش پسورد"
@@ -18,10 +32,23 @@
         "manage_users": "مدیرییت کاربران",
         "support": "پشتیبانی",
         "financial": "مالی",
-        "increase_number_config": "+",
-        "decrease_number_config": "-",
+        "increase_config_number": "+",
+        "decrease_config_number": "-",
+        "decrease_day_1": "-1",
+        "increase_day_1": "+1",
+        "decrease_day_10": "-10",
+        "increase_day_10": "+10",
+        "decrease_day_30": "-30",
+        "increase_day_30": "+30",
         "submit": "تایید",
-        "back": "بازگشت"
+        "back": "بازگشت",
+        "sharge_config": "تمدید کاربر",
+        "block_user": "بلاک کاربر",
+        "unblock_user": "انلاک کاربر",
+        "agent_users": "لیست کابران",
+        "status_user": "وضعیت کاربر",
+        "renew_user": "تغییر آپی کافیگ",
+        "help": "راهنما"
     },
     "callback_url": {
         "support": "https://t.me/xwyvern"
