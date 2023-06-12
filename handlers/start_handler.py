@@ -13,7 +13,7 @@ from methods.menu import MenuManager
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE, db):
 
     chat_id = update.effective_chat.id 
-    set_position(chat_id, 'mainmenu_manager', db)
+    set_position(chat_id, 'mainmenu', db)
     await MenuManager().manager(update, context)
     # options = ReplyKeyboardMarkup([
     #     [
