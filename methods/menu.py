@@ -21,12 +21,8 @@ from utils.exception import HTTPException
 
 class MenuManager:
 
-    def __init__(self) -> None:
-
-        self.ls_links = ['mainmenu_manager', 'mainmenu']
-
     @db_cache
-    async def manager(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db, backward= False):
+    async def manager(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db, edit= False):
         """
             manager requests this methods 
         """
@@ -35,20 +31,29 @@ class MenuManager:
 
         position = get_position(chat_id, db)
 
-        if position not in self.ls_links:
-            raise HTTPException(status_code=1002, detail=f'THis position not exist in the manager list [{self.__class__}]')
+        message_pointer = {
+            'mainmenu': lambda: self.mainmenu(update, context, db, edit)
+        }
 
-        index_pos = self.ls_links.index(position) 
-        
-        if backward:
-            new_position = self.ls_links[index_pos-1] 
-        
+        callback_pointer = {
+            'mainmenu': lambda: self.mainmenu(update, context, db, edit)
+        }
+
+        if edit: 
+            
+            query = update.callback_query
+
+            if query.data.split('_')[0] in  callback_pointer:
+                await callback_pointer[query.data.split('_')[0]]()
+
         else:
-            new_position = self.ls_links[index_pos+1] 
+            if position in message_pointer:
+                await message_pointer[position]()
         
-        await getattr(self, new_position)(update, context, db)
+        # if position not in self.ls_links:
+        #     raise HTTPException(status_code=1002, detail=f'THis position not exist in the manager list [{self.__class__}]')
 
-    async def mainmenu(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db):
+    async def mainmenu(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db, edit= False):
         """
             show main menu
         """
@@ -57,14 +62,14 @@ class MenuManager:
 
         inline_options = InlineKeyboardMarkup([
             [InlineKeyboardButton(loadStrings.callback_text.new_config, callback_data= 'newconfig')],
-            [InlineKeyboardButton(loadStrings.callback_text.manage_users, callback_data= 'manage_users')],
+            [InlineKeyboardButton(loadStrings.callback_text.manage_users, callback_data= 'manageusers')],
             [   
                 InlineKeyboardButton(loadStrings.callback_text.support, url= loadStrings.callback_url.support),
                 InlineKeyboardButton(loadStrings.callback_text.financial, callback_data= 'financial')
             ]
         ])
 
-        if getattr(update, 'callback_query') : 
+        if edit: 
             await update.callback_query.edit_message_text( loadStrings.text.menu, reply_markup= inline_options)
         
         else:
