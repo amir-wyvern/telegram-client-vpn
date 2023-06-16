@@ -31,6 +31,7 @@ class NewConfigManager:
             'newconfig_increase_number': lambda : self.increase_config_number(update, context, db),
             'newconfig_decrease_number': lambda : self.decrease_config_number(update, context, db),
             'newconfig_submit': lambda : self.submit(update, context, db),
+            'newconfig_tick': lambda : self.click(update, context, db),
         }
     
         if query.data in self.pointer:
@@ -172,10 +173,13 @@ class NewConfigManager:
 
         for request in range(number):
             resp = buy_ssh_service(session)
+            print(resp.status_code , resp.content)
             if resp.status_code != 200 :
                 inline_options = InlineKeyboardMarkup([
                     [   
-                        InlineKeyboardButton(loadStrings.callback_text.support, url= loadStrings.callback_url.support)
+                        InlineKeyboardButton(loadStrings.callback_text.support, url= loadStrings.callback_url.support),
+                        InlineKeyboardButton(loadStrings.callback_text.back, callback_data= 'newconfig')
+
                     ]
                 ])
 
@@ -186,9 +190,29 @@ class NewConfigManager:
             host = resp.json()['host']
             port = resp.json()['port']
 
+            inline_options = InlineKeyboardMarkup([
+                [   
+                    InlineKeyboardButton(loadStrings.callback_text.tick_for_understrike, callback_data= 'newconfig_tick'),
+                ]
+            ])
+
             config_text = loadStrings.text.config_text.format(host, port, username, password)
-            await context.bot.send_message(chat_id= chat_id, text= config_text, parse_mode='markdown')
+            await context.bot.send_message(chat_id= chat_id, text= config_text, parse_mode='markdown', reply_markup= inline_options)
 
         set_position(chat_id, 'mainmenu', db)
         await MenuManager().manager(update, context)
 
+
+    async def click(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db):
+        """
+           send request to server for get new config
+        """
+        query = update.callback_query
+
+        new_text = []
+        for line in query.message.text.split('\n'):
+            main_line, strike_line = line.split(' ')
+            new_text.append(f' {main_line} <s>{strike_line}</s>')
+
+        join_text=  '\n'.join(new_text).strip()
+        await query.edit_message_text(text= join_text, parse_mode='html')
