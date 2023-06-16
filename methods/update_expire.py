@@ -47,7 +47,6 @@ class UpdateExpireConfigManager:
             'updateexpire_get_username': lambda: self.update_expire_get_username(update, context, db)
         }
         if edit :
-            print(query.data)
 
             if query.data in callback_pointer: 
                 await callback_pointer[query.data]()
@@ -188,7 +187,8 @@ class UpdateExpireConfigManager:
         if 'number_day' not in cache:
             await query.answer(loadStrings.text.empty_day_field)
             return
-
+        
+        await query.message.delete()
         new_expire = datetime.now() + timedelta(days= cache['number_day'])
         username = cache['username']
         resp = update_expire_ssh_service(session, username, new_expire.strftime('%Y-%m-%dT%H:%M:%S'))
@@ -231,6 +231,8 @@ class UpdateExpireConfigManager:
                 await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.internal_error, reply_markup= inline_options)
                 return
         
+
+
         set_position(chat_id, 'manageusers', db)
         delete_cache(chat_id, db)
         new_expire_jalali = (JalaliDateTime.now() + timedelta(days= cache['number_day']) ).strftime("%Y/%m/%d")
