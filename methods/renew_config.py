@@ -9,8 +9,7 @@ from lang import loadStrings
 from cache.cache_session import (
     set_position,
     get_position,
-    get_session,
-    delete_cache
+    get_session
 )
 from utils.db_cache import db_cache
 from api.services import renew_ssh_service
@@ -27,6 +26,7 @@ class RenewConfigManager:
         query = update.callback_query
         callback_pointer = {
             'renewconfig': lambda: self.renew_config(update, context, db),
+            'renewconfig_tick': lambda: self.click(update, context, db)
         }
 
         message_pointer = {
@@ -94,7 +94,7 @@ class RenewConfigManager:
                 inline_options = InlineKeyboardMarkup([
                     [   
                         InlineKeyboardButton(loadStrings.callback_text.support, url= loadStrings.callback_url.support),
-                        InlineKeyboardButton(loadStrings.callback_text.back, callback_data= 'renewconfig')
+                        InlineKeyboardButton(loadStrings.callback_text.back, callback_data= 'manageusers')
                     ]
                 ])
 
@@ -118,10 +118,27 @@ class RenewConfigManager:
         host = resp.json()['host']
         port = resp.json()['port']
 
-        delete_cache(chat_id, db)
         set_position(chat_id, 'manageusers', db)
 
+        inline_options = InlineKeyboardMarkup([
+            [   
+                InlineKeyboardButton(loadStrings.callback_text.tick_for_understrike, callback_data= 'renewconfig_tick'),
+            ]
+        ])
         config_text = loadStrings.text.renew_config_resp.format(host, port, username, password)
-        await context.bot.send_message(chat_id= chat_id, text= config_text, parse_mode='markdown')
+        await context.bot.send_message(chat_id= chat_id, text= config_text, parse_mode='markdown', reply_markup=inline_options)
         await ManageUsersManager().manager(update, context, edit= False)
 
+    async def click(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db):
+        """
+           send request to server for get new config
+        """
+        query = update.callback_query
+
+        new_text = []
+        for line in query.message.text.split('\n'):
+            main_line, strike_line = line.split(' ')
+            new_text.append(f' {main_line} <s>{strike_line}</s>')
+
+        join_text=  '\n'.join(new_text).strip()
+        await query.edit_message_text(text= join_text, parse_mode='html')
