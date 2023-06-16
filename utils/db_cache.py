@@ -8,7 +8,6 @@ def db_cache(func):
         
         db_cache = get_redis_cache().__next__()
         kwargs.update({'db': db_cache})
-        print('func : ',func)
         result = await func(*args, **kwargs)
         return result
     
