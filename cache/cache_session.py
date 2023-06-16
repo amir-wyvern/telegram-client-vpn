@@ -65,3 +65,18 @@ def get_cache(chat_id, db:redis.Redis):
 
     data = db.hget(f'tel:agent:{chat_id}', 'cache')
     return json.loads(data)
+
+def set_msg_id(chat_id, msg_id, db: redis.Redis):
+    
+    db.rpush(f'tel:agent:msg_id:{chat_id}', msg_id)
+    return True
+
+def get_msg_id(chat_id, db: redis.Redis):
+
+    data = db.lrange(f'tel:agent:msg_id:{chat_id}')
+    return data
+
+def remove_msg_id(chat_id, msg_id, db: redis.Redis):
+
+    resp = db.lrem(f'tel:agent:msg_id:{chat_id}', count=1, value= msg_id)
+    return resp
