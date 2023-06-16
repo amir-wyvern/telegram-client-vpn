@@ -41,6 +41,36 @@ def renew_ssh_service(session, username):
 
     return resp
 
+def block_user_ssh_service(session, username):
+
+    data = {
+        'username': username
+    }
+    
+    resp = requests.post(URL + 'agent/ssh/block', json= data, headers= _header(session))
+
+    return resp
+
+def unblock_user_ssh_service(session, username):
+
+    data = {
+        'username': username
+    }
+    
+    resp = requests.post(URL + 'agent/ssh/unblock', json= data, headers= _header(session))
+
+    return resp
+
+def user_status_ssh_service(session, username):
+
+    params = {
+        'username': username
+    }
+    
+    resp = requests.get(URL + 'user/services', params= params, headers= _header(session))
+
+    return resp
+
 def update_expire_ssh_service(session, username, expire):
 
     data = {
