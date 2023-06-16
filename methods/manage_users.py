@@ -60,15 +60,14 @@ class ManageUsersManager:
                 InlineKeyboardButton(loadStrings.callback_text.sharge_config, callback_data= 'updateexpire')
             ],
             [   
-                InlineKeyboardButton(loadStrings.callback_text.block_user, callback_data= 'manageusers_block_user'),
-                InlineKeyboardButton(loadStrings.callback_text.unblock_user, callback_data= 'manageusers_unblock_user'),
-                InlineKeyboardButton(loadStrings.callback_text.status_user, callback_data= 'manageusers_status_user')
+                InlineKeyboardButton(loadStrings.callback_text.block_user, callback_data= 'blockuser'),
+                InlineKeyboardButton(loadStrings.callback_text.unblock_user, callback_data= 'unblockuser')
             ],
             [
-                InlineKeyboardButton(loadStrings.callback_text.agent_users, callback_data= 'manageusers_agent_users')
+                InlineKeyboardButton(loadStrings.callback_text.status_user, callback_data= 'userstatus')
             ],
             [
-                InlineKeyboardButton(loadStrings.callback_text.help, callback_data= 'manageusers_help'),
+                InlineKeyboardButton(loadStrings.callback_text.help, callback_data= 'help'),
                 InlineKeyboardButton(loadStrings.callback_text.back, callback_data= 'mainmenu')
             ]
         ])
@@ -78,6 +77,4 @@ class ManageUsersManager:
 
         else:
             await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.menu, reply_markup= inline_options)
-
-
 
