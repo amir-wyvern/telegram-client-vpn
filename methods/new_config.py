@@ -181,18 +181,32 @@ class NewConfigManager:
         for count in range(number):
             resp = buy_ssh_service(session)
 
+
             if resp.status_code != 200 :
+
                 inline_options = InlineKeyboardMarkup([
                     [   
                         InlineKeyboardButton(loadStrings.callback_text.support, url= loadStrings.callback_url.support),
                         InlineKeyboardButton(loadStrings.callback_text.back, callback_data= 'newconfig')
-
                     ]
                 ])
 
-                resp_msg = await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.error_config, reply_markup= inline_options)
-                set_msg_id(chat_id, resp_msg.message_id, db)
-                continue
+                if resp.status_code in [404, 409]:
+                
+                    message = loadStrings.text.internal_error
+                
+                    if resp.json()['detail']['internal_code'] == 1412:
+                        message = loadStrings.text.insufficient_balance
+                    
+                    resp_msg = await context.bot.send_message(chat_id= chat_id, text= message, reply_markup= inline_options)
+                    set_msg_id(chat_id, resp_msg.message_id, db)
+                    return
+
+                else:
+
+                    resp_msg = await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.error_config, reply_markup= inline_options)
+                    set_msg_id(chat_id, resp_msg.message_id, db)
+                    continue
             
             if total_config != '***':
                 config_number = total_config + count + 1
