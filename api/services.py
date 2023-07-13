@@ -13,7 +13,12 @@ def _header(session):
 def get_best_interface(session):
 
     _params = {'mode': 'best'}
-    resp = requests.get(URL + 'interface/ssh/fetch', params= _params, headers= _header(session))
+
+    for _ in range(2):
+        resp = requests.get(URL + 'interface/ssh/fetch', params= _params, headers= _header(session))
+        if resp.status_code == 200:
+            break
+    
     return resp
 
 def buy_ssh_service(session):
@@ -27,7 +32,10 @@ def buy_ssh_service(session):
         'interface_id': resp_interface.json()[0]['interface_id']
     }
     
-    resp = requests.post(URL + 'agent/ssh/new', json= data, headers= _header(session))
+    for _ in range(2):
+        resp = requests.post(URL + 'agent/ssh/new', json= data, headers= _header(session))
+        if resp.status_code == 200:
+            break
 
     return resp
 
@@ -36,8 +44,11 @@ def renew_ssh_service(session, username):
     data = {
         'username': username
     }
-    
-    resp = requests.post(URL + 'agent/ssh/renew', json= data, headers= _header(session))
+
+    for _ in range(2):
+        resp = requests.post(URL + 'agent/ssh/renew', json= data, headers= _header(session))
+        if resp.status_code == 200:
+            break
 
     return resp
 
@@ -47,7 +58,10 @@ def block_user_ssh_service(session, username):
         'username': username
     }
     
-    resp = requests.post(URL + 'agent/ssh/block', json= data, headers= _header(session))
+    for _ in range(2):
+        resp = requests.post(URL + 'agent/ssh/block', json= data, headers= _header(session))
+        if resp.status_code == 200:
+            break
 
     return resp
 
@@ -57,7 +71,10 @@ def unblock_user_ssh_service(session, username):
         'username': username
     }
     
-    resp = requests.post(URL + 'agent/ssh/unblock', json= data, headers= _header(session))
+    for _ in range(2):
+        resp = requests.post(URL + 'agent/ssh/unblock', json= data, headers= _header(session))
+        if resp.status_code == 200:
+            break
 
     return resp
 
@@ -67,7 +84,10 @@ def user_status_ssh_service(session, username):
         'username': username
     }
     
-    resp = requests.get(URL + 'user/services', params= params, headers= _header(session))
+    for _ in range(2):
+        resp = requests.get(URL + 'user/services', params= params, headers= _header(session))
+        if resp.status_code == 200:
+            break
 
     return resp
 
@@ -75,9 +95,14 @@ def update_expire_ssh_service(session, username, expire):
 
     data = {
         'username': username, 
-        'new_expire': expire
+        'new_expire': expire,
+        'unblock': True
     }
-    
-    resp = requests.post(URL + 'agent/ssh/expire', json= data, headers= _header(session))
 
+    for _ in range(2):
+        resp = requests.post(URL + 'agent/ssh/expire', json= data, headers= _header(session))
+        if resp.status_code == 200:
+            break
+        
     return resp
+
