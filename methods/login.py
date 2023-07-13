@@ -147,7 +147,7 @@ class LoginManager:
             return
 
         delete_cache(chat_id, db)
-        msg_delete_all(chat_id, db)
+        await msg_delete_all(chat_id, db)
         
         set_session(chat_id, resp.json()['access_token'], db)
 
