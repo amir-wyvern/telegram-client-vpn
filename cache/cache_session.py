@@ -24,8 +24,8 @@ def set_new_user(chat_id, db: redis.Redis, **kwargs)-> dict:
     }
     data.update(kwargs)
 
-    db.hset(f'tel:agent:{chat_id}', mapping= data)
-    return data
+    resp = db.hset(f'tel:agent:{chat_id}', mapping= data)
+    return resp
 
 def set_session(chat_id, session, db: redis.Redis):
 
@@ -43,8 +43,8 @@ def get_session(chat_id, db: redis.Redis):
 
 def set_position(chat_id, pos, db:redis.Redis):
 
-    db.hset(f'tel:agent:{chat_id}', 'pos', pos)
-    return pos
+    resp = db.hset(f'tel:agent:{chat_id}', 'pos', pos)
+    return resp
 
 def get_position(chat_id, db:redis.Redis):
 
@@ -53,8 +53,8 @@ def get_position(chat_id, db:redis.Redis):
 
 def set_cache(chat_id, data, db:redis.Redis):
 
-    x = db.hset(f'tel:agent:{chat_id}', 'cache', json.dumps(data))
-    return data
+    resp = db.hset(f'tel:agent:{chat_id}', 'cache', json.dumps(data))
+    return resp
 
 def delete_cache(chat_id, db:redis.Redis):
 
@@ -67,13 +67,13 @@ def get_cache(chat_id, db:redis.Redis):
     return json.loads(data)
 
 def set_msg_id(chat_id, msg_id, db: redis.Redis):
-    
-    db.rpush(f'tel:agent:msg_id:{chat_id}', msg_id)
-    return True
+
+    resp = db.rpush(f'tel:agent:msg_id:{chat_id}', msg_id)
+    return resp
 
 def get_msg_id(chat_id, db: redis.Redis):
 
-    data = db.lrange(f'tel:agent:msg_id:{chat_id}')
+    data = db.lrange(f'tel:agent:msg_id:{chat_id}', start=0 ,end=-1)
     return data
 
 def remove_msg_id(chat_id, msg_id, db: redis.Redis):

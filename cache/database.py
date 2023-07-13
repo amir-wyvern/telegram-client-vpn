@@ -34,4 +34,3 @@ def get_redis_cache():
 
     finally:
         session.redis_db.close()
-
