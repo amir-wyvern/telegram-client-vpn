@@ -9,14 +9,12 @@ def auth(func):
             raise 'db decorator is not used'
         
         session = get_session(args[1]._chat_id, kwargs['db'])
-        print('session: ', session)
         if session is None:
             set_position(args[1]._chat_id, 'login_manager', kwargs['db'])
             await LoginManager().manager(*args)
             return
 
         result = await func(*args, **kwargs)
-        print('res:', result)
         return result
     
     return wrapper
