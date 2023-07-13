@@ -202,6 +202,12 @@ class UpdateExpireConfigManager:
                 
                 message = loadStrings.text.internal_error
                 
+                inline_options = InlineKeyboardMarkup([
+                    [   
+                        InlineKeyboardButton(loadStrings.callback_text.support, url= loadStrings.callback_url.support),
+                        InlineKeyboardButton(loadStrings.callback_text.back, callback_data= 'updateexpire')
+                    ]
+                ])
                 if resp.json()['detail']['internal_code'] == 2433:
                     message = loadStrings.text.error_username_not_have_service
 
@@ -213,13 +219,12 @@ class UpdateExpireConfigManager:
                 
                 if resp.json()['detail']['internal_code'] == 1412:
                     message = loadStrings.text.insufficient_balance
-
-                inline_options = InlineKeyboardMarkup([
-                    [   
-                        InlineKeyboardButton(loadStrings.callback_text.support, url= loadStrings.callback_url.support),
-                        InlineKeyboardButton(loadStrings.callback_text.back, callback_data= 'updateexpire')
-                    ]
-                ])
+                    inline_options = InlineKeyboardMarkup([
+                        [   
+                            InlineKeyboardButton(loadStrings.callback_text.financial, callback_data= 'financial'),
+                            InlineKeyboardButton(loadStrings.callback_text.back, callback_data= 'newconfig')
+                        ]
+                    ])
 
                 resp_msg = await context.bot.send_message(chat_id= chat_id, text= message, reply_markup= inline_options)
                 set_msg_id(chat_id, resp_msg.message_id, db)
