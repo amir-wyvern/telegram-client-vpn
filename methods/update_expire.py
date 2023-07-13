@@ -249,6 +249,6 @@ class UpdateExpireConfigManager:
         message = loadStrings.text.update_expire_success.format(username, new_expire_jalali) 
         resp_msg = await context.bot.send_message(chat_id= chat_id, text= message, parse_mode='markdown') 
         set_msg_id(chat_id, resp_msg.message_id, db)
-        set_position(chat_id, 'mainmenu', db)
+        set_position(chat_id, 'manageusers', db)
         
         await ManageUsersManager().manager(update, context, edit= False) 
