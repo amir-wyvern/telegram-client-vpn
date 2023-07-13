@@ -1,23 +1,20 @@
 from telegram import (
     Update,
     InlineKeyboardMarkup,
-    InlineKeyboardButton,
-    ReplyKeyboardMarkup,
-    KeyboardButton,
+    InlineKeyboardButton
 )
 from telegram.ext import ContextTypes
 from telegram import Update
 from lang import loadStrings
 from cache.cache_session import (
-    set_position,
     get_position,
     delete_cache,
-    set_cache,
-    get_cache,
-    set_session
+    set_msg_id,
+    set_position,
+    get_session
 )
 from utils.db_cache import db_cache
-from utils.exception import HTTPException
+from api.profile import get_profile
 
 class MenuManager:
 
@@ -60,6 +57,8 @@ class MenuManager:
         chat_id = update.effective_chat.id
         delete_cache(chat_id, db)
 
+        set_position(chat_id, 'mainmenu', db)
+
         inline_options = InlineKeyboardMarkup([
             [InlineKeyboardButton(loadStrings.callback_text.new_config, callback_data= 'newconfig')],
             [InlineKeyboardButton(loadStrings.callback_text.manage_users, callback_data= 'manageusers')],
@@ -69,8 +68,40 @@ class MenuManager:
             ]
         ])
 
+        session = get_session(chat_id, db)
+        resp = get_profile(session)
+
+        if resp.status_code != 200 :
+            # inline_options = InlineKeyboardMarkup([
+            #     [   
+            #         InlineKeyboardButton(loadStrings.callback_text.support, url= loadStrings.callback_url.support)
+            #     ]
+            # ])
+
+            # resp_msg = await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.error_config, reply_markup= inline_options)
+            # set_msg_id(chat_id, resp_msg.message_id, db)
+
+            username= "***"
+            balance= "***"
+            total_user= "***"
+            enable_ssh_services= "***"
+            disable_ssh_services= "***"
+            deleted_ssh_services= "***"
+
+        else:
+
+            data = resp.json()
+            username= data['username']
+            balance= data['balance']
+            total_user= data['total_user']
+            enable_ssh_services= data['enable_ssh_services']
+            disable_ssh_services= data['disable_ssh_services']
+            deleted_ssh_services= data['deleted_ssh_services']
+        
+        text = loadStrings.text.menu.format(username, total_user, enable_ssh_services, disable_ssh_services, deleted_ssh_services, balance)
         if edit: 
-            await update.callback_query.edit_message_text( loadStrings.text.menu, reply_markup= inline_options)
+            resp_msg = await update.callback_query.edit_message_text( text, reply_markup= inline_options)
         
         else:
-            await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.menu, reply_markup= inline_options)
+            resp_msg = await context.bot.send_message(chat_id= chat_id, text= text, reply_markup= inline_options)
+            set_msg_id(chat_id, resp_msg.message_id, db)

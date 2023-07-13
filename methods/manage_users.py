@@ -9,8 +9,12 @@ from lang import loadStrings
 from cache.cache_session import (
     get_position,
     delete_cache,
+    set_msg_id,
+    get_session,
+    set_position
 )
 from utils.db_cache import db_cache
+from api.profile import get_profile
 
 class ManageUsersManager:
 
@@ -24,13 +28,10 @@ class ManageUsersManager:
         query = update.callback_query
         callback_pointer = {
             'manageusers': lambda : self.manageusers(update, context, db, edit=edit),
-            'manageusers_renew_user': lambda: self.renew_config(update, context, db),
-            'manageusers_renew_config_get_username': lambda: self.renew_config_get_username(update, context, db),
         }
 
         message_pointer = {
             'manageusers': lambda : self.manageusers(update, context, db, edit=edit),
-            'manageusers_get_renew_config': lambda: self.renew_config_get_username(update, context, db)
         }
         
         if edit :
@@ -42,7 +43,6 @@ class ManageUsersManager:
 
             chat_id = update.effective_chat.id
             pos = get_position(chat_id, db)
-
             if pos in message_pointer :
                 await message_pointer[pos]()
 
@@ -53,6 +53,8 @@ class ManageUsersManager:
         chat_id = update.effective_chat.id
 
         delete_cache(chat_id, db)
+        set_position(chat_id, 'manageusers', db)
+
 
         inline_options = InlineKeyboardMarkup([
             [
@@ -72,9 +74,41 @@ class ManageUsersManager:
             ]
         ])
 
-        if edit:
-            await update.callback_query.edit_message_text( loadStrings.text.menu, reply_markup= inline_options)
+
+
+        session = get_session(chat_id, db)
+        resp = get_profile(session)
+
+        if resp.status_code != 200 :
+            # inline_options = InlineKeyboardMarkup([
+            #     [   
+            #         InlineKeyboardButton(loadStrings.callback_text.support, url= loadStrings.callback_url.support)
+            #     ]
+            # ])
+
+            # resp_msg = await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.error_config, reply_markup= inline_options)
+            # set_msg_id(chat_id, resp_msg.message_id, db)
+
+            username= "***"
+            total_user= "***"
+            enable_ssh_services= "***"
+            disable_ssh_services= "***"
+            deleted_ssh_services= "***"
 
         else:
-            await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.menu, reply_markup= inline_options)
 
+            data = resp.json()
+            username= data['username']
+            total_user= data['total_user']
+            enable_ssh_services= data['enable_ssh_services']
+            disable_ssh_services= data['disable_ssh_services']
+            deleted_ssh_services= data['deleted_ssh_services']
+        
+        text = loadStrings.text.usersmanager_menu.format(username, total_user, enable_ssh_services, disable_ssh_services, deleted_ssh_services)
+
+        if edit:
+            await update.callback_query.edit_message_text( text, reply_markup= inline_options)
+
+        else:
+            resp_msg = await context.bot.send_message(chat_id= chat_id, text= text, reply_markup= inline_options)
+            set_msg_id(chat_id, resp_msg.message_id, db)

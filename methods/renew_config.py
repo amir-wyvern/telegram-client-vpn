@@ -9,7 +9,8 @@ from lang import loadStrings
 from cache.cache_session import (
     set_position,
     get_position,
-    get_session
+    get_session,
+    set_msg_id
 )
 from utils.db_cache import db_cache
 from api.services import renew_ssh_service
@@ -61,7 +62,8 @@ class RenewConfigManager:
                 ]
             )
 
-        await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.renew_config_text, reply_markup= inline_options)
+        resp_msg = await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.renew_config_text, reply_markup= inline_options)
+        set_msg_id(chat_id, resp_msg.message_id, db)
 
     async def renew_config_get_username(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db):
         
@@ -98,7 +100,8 @@ class RenewConfigManager:
                     ]
                 ])
 
-                await context.bot.send_message(chat_id= chat_id, text= message, reply_markup= inline_options)
+                resp_msg = await context.bot.send_message(chat_id= chat_id, text= message, reply_markup= inline_options)
+                set_msg_id(chat_id, resp_msg.message_id, db)
                 return
 
             else:
@@ -110,15 +113,14 @@ class RenewConfigManager:
                     ]
                 ])
 
-                await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.internal_error, reply_markup= inline_options)
+                resp_msg = await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.internal_error, reply_markup= inline_options)
+                set_msg_id(chat_id, resp_msg.message_id, db)
                 return
 
         username = resp.json()['username']
         password = resp.json()['password']
         host = resp.json()['host']
         port = resp.json()['port']
-
-        set_position(chat_id, 'manageusers', db)
 
         inline_options = InlineKeyboardMarkup([
             [   
@@ -127,6 +129,7 @@ class RenewConfigManager:
         ])
         config_text = loadStrings.text.renew_config_resp.format(host, port, username, password)
         await context.bot.send_message(chat_id= chat_id, text= config_text, parse_mode='markdown', reply_markup=inline_options)
+        
         await ManageUsersManager().manager(update, context, edit= False)
 
     async def click(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db):

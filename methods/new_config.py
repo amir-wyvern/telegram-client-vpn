@@ -10,10 +10,12 @@ from cache.cache_session import (
     set_position,
     set_cache,
     get_cache,
-    get_session
+    get_session,
+    set_msg_id
 )
 from utils.db_cache import db_cache
 from api.services import buy_ssh_service
+from api.profile import get_profile
 from methods.menu import MenuManager
 
 
@@ -167,13 +169,18 @@ class NewConfigManager:
             await query.answer(loadStrings.text.zero_number_config)
             return
         
-        session = get_session(chat_id, db)
 
         await query.message.delete()
 
-        for request in range(number):
+        session = get_session(chat_id, db)
+        resp = get_profile(session)
+        total_config = '***'
+        if resp.status_code == 200 :
+            total_config = int(resp.json()['total_user'])
+
+        for count in range(number):
             resp = buy_ssh_service(session)
-            print(resp.status_code , resp.content)
+
             if resp.status_code != 200 :
                 inline_options = InlineKeyboardMarkup([
                     [   
@@ -183,8 +190,21 @@ class NewConfigManager:
                     ]
                 ])
 
-                await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.error_config, reply_markup= inline_options)
+                resp_msg = await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.error_config, reply_markup= inline_options)
+                set_msg_id(chat_id, resp_msg.message_id, db)
+                continue
             
+            if total_config != '***':
+                config_number = total_config + count + 1
+                if len(str(config_number)) == 1:
+                    config_number = f'  {config_number}  '
+                elif len(str(config_number)) == 2:
+                    config_number = f' {config_number}  '
+                elif len(str(config_number)) == 3:
+                    config_number = f' {config_number} '
+                elif len(str(config_number)) == 4:
+                    config_number = f'{config_number} '
+
             username = resp.json()['username']
             password = resp.json()['password']
             host = resp.json()['host']
@@ -196,7 +216,7 @@ class NewConfigManager:
                 ]
             ])
 
-            config_text = loadStrings.text.config_text.format(host, port, username, password)
+            config_text = loadStrings.text.config_text.format(host, port, username, password, config_number)
             await context.bot.send_message(chat_id= chat_id, text= config_text, parse_mode='markdown', reply_markup= inline_options)
 
         set_position(chat_id, 'mainmenu', db)
@@ -205,14 +225,17 @@ class NewConfigManager:
 
     async def click(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db):
         """
-           send request to server for get new config
+           strike config 
         """
         query = update.callback_query
+        sp_old_text = query.message.text.split('\n')
 
         new_text = []
-        for line in query.message.text.split('\n'):
+        new_text.append(sp_old_text[0].replace('🔹', '▪', 2))
+
+        for line in sp_old_text[1:]:
             main_line, strike_line = line.split(' ')
-            new_text.append(f' {main_line} <s>{strike_line}</s>')
+            new_text.append(f'{main_line} <s>{strike_line}</s>')
 
         join_text=  '\n'.join(new_text).strip()
         await query.edit_message_text(text= join_text, parse_mode='html')

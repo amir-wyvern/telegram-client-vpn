@@ -13,7 +13,8 @@ from cache.cache_session import (
     delete_cache,
     set_cache,
     get_cache,
-    get_session
+    get_session,
+    set_msg_id
 )
 from utils.db_cache import db_cache
 from api.services import update_expire_ssh_service
@@ -75,14 +76,16 @@ class UpdateExpireConfigManager:
                 ]
             )
         
-        await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.update_expire_get_username_text, reply_markup= inline_options)
+        resp_msg = await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.update_expire_get_username_text, reply_markup= inline_options)
+        set_msg_id(chat_id, resp_msg.message_id, db)
 
     async def update_expire_get_username(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db):
         
         chat_id = update.effective_chat.id
 
         text = update.message.text
-
+        set_position(chat_id, 'None', db)
+        
         cache = {
             'username': text
         }
@@ -120,8 +123,8 @@ class UpdateExpireConfigManager:
             date_day =  date_day + timedelta(days=cache['number_day'])
 
         text_day = loadStrings.text.expire_day_text.format(date_day.strftime("%Y/%m/%d"))
-        await context.bot.send_message(chat_id= chat_id, text= text_day, reply_markup= inline_options)
-        
+        resp_msg = await context.bot.send_message(chat_id= chat_id, text= text_day, reply_markup= inline_options)
+        set_msg_id(chat_id, resp_msg.message_id, db)
 
     async def update_expire_get_expire_date(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db):
 
@@ -216,7 +219,8 @@ class UpdateExpireConfigManager:
                     ]
                 ])
 
-                await context.bot.send_message(chat_id= chat_id, text= message, reply_markup= inline_options)
+                resp_msg = await context.bot.send_message(chat_id= chat_id, text= message, reply_markup= inline_options)
+                set_msg_id(chat_id, resp_msg.message_id, db)
                 return
 
             else:
@@ -228,15 +232,15 @@ class UpdateExpireConfigManager:
                     ]
                 ])
 
-                await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.internal_error, reply_markup= inline_options)
+                resp_msg = await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.internal_error, reply_markup= inline_options)
+                set_msg_id(chat_id, resp_msg.message_id, db)
                 return
-        
 
-
-        set_position(chat_id, 'manageusers', db)
         delete_cache(chat_id, db)
         new_expire_jalali = (JalaliDateTime.now() + timedelta(days= cache['number_day']) ).strftime("%Y/%m/%d")
 
         message = loadStrings.text.update_expire_success.format(username, new_expire_jalali) 
-        await context.bot.send_message(chat_id= chat_id, text= message, parse_mode='markdown') 
+        resp_msg = await context.bot.send_message(chat_id= chat_id, text= message, parse_mode='markdown') 
+        set_msg_id(chat_id, resp_msg.message_id, db)
+        
         await ManageUsersManager().manager(update, context, edit= False) 

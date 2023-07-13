@@ -6,10 +6,6 @@ from telegram import (
 from telegram.ext import ContextTypes
 from telegram import Update
 from lang import loadStrings
-from cache.cache_session import (
-    set_position,
-    get_position
-)
 from utils.db_cache import db_cache
 
 class HelpManager:

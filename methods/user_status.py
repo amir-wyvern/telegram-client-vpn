@@ -9,7 +9,8 @@ from lang import loadStrings
 from cache.cache_session import (
     set_position,
     get_position,
-    get_session
+    get_session,
+    set_msg_id
 )
 from utils.db_cache import db_cache
 from api.services import user_status_ssh_service
@@ -65,7 +66,8 @@ class UserStatusManager:
                 ]
             )
 
-        await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.renew_config_text, reply_markup= inline_options)
+        resp_msg = await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.renew_config_text, reply_markup= inline_options)
+        set_msg_id(chat_id, resp_msg.message_id, db)
 
     async def user_status_get_username(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db):
         
@@ -90,7 +92,8 @@ class UserStatusManager:
                     ]
                 ])
 
-                await context.bot.send_message(chat_id= chat_id, text= message, reply_markup= inline_options)
+                resp_msg = await context.bot.send_message(chat_id= chat_id, text= message, reply_markup= inline_options)
+                set_msg_id(chat_id, resp_msg.message_id, db)
                 return
 
             else:
@@ -102,10 +105,9 @@ class UserStatusManager:
                     ]
                 ])
 
-                await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.internal_error, reply_markup= inline_options)
+                resp_msg = await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.internal_error, reply_markup= inline_options)
+                set_msg_id(chat_id, resp_msg.message_id, db)
                 return
-
-        set_position(chat_id, 'manageusers', db)
 
         status_dict = {
             'enable': 'فعال',
@@ -142,9 +144,10 @@ class UserStatusManager:
 
         config_text = loadStrings.text.user_status_text.format(host, port, username, password, created, expire, status)
         await context.bot.send_message(chat_id= chat_id, text= config_text, parse_mode='markdown', reply_markup= inline_options)
+        set_position(chat_id, 'manageusers', db)
+    
         await ManageUsersManager().manager(update, context, edit= False)
-
-
+    
     async def click(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db):
         
         query = update.callback_query

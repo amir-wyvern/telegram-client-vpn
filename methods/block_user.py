@@ -9,7 +9,8 @@ from lang import loadStrings
 from cache.cache_session import (
     set_position,
     get_position,
-    get_session
+    get_session,
+    set_msg_id
 )
 from utils.db_cache import db_cache
 from api.services import block_user_ssh_service
@@ -60,7 +61,8 @@ class BlockUserManager:
                 ]
             )
 
-        await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.renew_config_text, reply_markup= inline_options)
+        resp_msg =  await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.renew_config_text, reply_markup= inline_options)
+        set_msg_id(chat_id, resp_msg.message_id, db)
 
     async def block_user_get_username(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db):
         
@@ -94,7 +96,9 @@ class BlockUserManager:
                     ]
                 ])
 
-                await context.bot.send_message(chat_id= chat_id, text= message, reply_markup= inline_options)
+                resp_msg = await context.bot.send_message(chat_id= chat_id, text= message, reply_markup= inline_options)
+                set_msg_id(chat_id, resp_msg.message_id, db)
+                
                 return
 
             else:
@@ -106,11 +110,12 @@ class BlockUserManager:
                     ]
                 ])
 
-                await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.internal_error, reply_markup= inline_options)
+                resp_msg = await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.internal_error, reply_markup= inline_options)
+                set_msg_id(chat_id, resp_msg.message_id, db)
                 return
 
-        set_position(chat_id, 'manageusers', db)
-
-        await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.block_user_success.format(text), parse_mode='markdown')
+        resp_msg = await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.block_user_success.format(text), parse_mode='markdown')
+        set_msg_id(chat_id, resp_msg.message_id, db)
+        
         await ManageUsersManager().manager(update, context, edit= False)
 
