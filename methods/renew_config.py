@@ -143,7 +143,7 @@ class RenewConfigManager:
         new_text = []
         for line in query.message.text.split('\n'):
             main_line, strike_line = line.split(' ')
-            new_text.append(f' {main_line} <s>{strike_line}</s>')
+            new_text.append(f'{main_line} <s>{strike_line}</s>')
 
         join_text=  '\n'.join(new_text).strip()
         await query.edit_message_text(text= join_text, parse_mode='html')
