@@ -130,6 +130,8 @@ class RenewConfigManager:
         config_text = loadStrings.text.renew_config_resp.format(host, port, username, password)
         await context.bot.send_message(chat_id= chat_id, text= config_text, parse_mode='markdown', reply_markup=inline_options)
         
+        set_position(chat_id, 'mainmenu', db)
+        
         await ManageUsersManager().manager(update, context, edit= False)
 
     async def click(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db):

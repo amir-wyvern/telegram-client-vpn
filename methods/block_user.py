@@ -117,5 +117,7 @@ class BlockUserManager:
         resp_msg = await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.block_user_success.format(text), parse_mode='markdown')
         set_msg_id(chat_id, resp_msg.message_id, db)
         
+        set_position(chat_id, 'mainmenu', db)
+        
         await ManageUsersManager().manager(update, context, edit= False)
 
