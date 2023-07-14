@@ -15,6 +15,7 @@ from methods.block_user import BlockUserManager
 from methods.unblock_user import UnBlockUserManager
 from methods.help import HelpManager
 from methods.financial import FinancialManager
+from methods.delete_user import DeleteUserManager
 
 
 newConfigManager = NewConfigManager()
@@ -28,6 +29,7 @@ blockUser = BlockUserManager()
 unblockUser = UnBlockUserManager()
 help = HelpManager()
 financial = FinancialManager()
+deleteUser = DeleteUserManager()
 
 @db_cache
 async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, db):
@@ -45,6 +47,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, d
         'renewconfig': lambda: renewConfig.manager(update, context, edit=True),
         'userstatus': lambda: userStatus.manager(update, context, edit=True),
         'blockuser': lambda: blockUser.manager(update, context, edit=True),
+        'deleteuser': lambda: deleteUser.manager(update, context, edit=True),
         'unblockuser': lambda: unblockUser.manager(update, context, edit=True),
         'financial': lambda: financial.manager(update, context, edit=True),
         'help': lambda: help.manager(update, context, edit=True)

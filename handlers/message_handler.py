@@ -8,6 +8,7 @@ from methods.manage_users import ManageUsersManager
 from methods.update_expire import UpdateExpireConfigManager
 from methods.renew_config import RenewConfigManager
 from methods.user_status import UserStatusManager
+from methods.delete_user import DeleteUserManager
 from methods.block_user import BlockUserManager
 from methods.unblock_user import UnBlockUserManager
 
@@ -22,6 +23,7 @@ renewConfig = RenewConfigManager()
 userStatus = UserStatusManager()
 blockUser = BlockUserManager()
 unBlockUser = UnBlockUserManager()
+deleteUser = DeleteUserManager()
 
 @db_cache
 async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, db):
@@ -35,12 +37,14 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, db
         'renewconfig': lambda: renewConfig.manager(update, context, edit= False),
         'userstatus': lambda: userStatus.manager(update, context, edit=False),
         'blockuser': lambda: blockUser.manager(update, context, edit=False),
+        'deleteuser': lambda: deleteUser.manager(update, context, edit=False),
         'unblockuser': lambda: unBlockUser.manager(update, context, edit=False)
     }
 
     # its used for manage delete message_id, if a msg_id exist in this pos , that msg_id dont delete directly
     used_for_msg = [
         'blockuser_get_username',
+        'deleteuser_get_username',
         'login_get_username',
         'login_get_password',
         'renewconfig_get_username',
