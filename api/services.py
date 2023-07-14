@@ -65,6 +65,19 @@ def block_user_ssh_service(session, username):
 
     return resp
 
+def delete_user_ssh_service(session, username):
+
+    data = {
+        'username': username
+    }
+    
+    for _ in range(2):
+        resp = requests.delete(URL + 'agent/ssh/delete', json= data, headers= _header(session))
+        if resp.status_code == 200:
+            break
+
+    return resp
+
 def unblock_user_ssh_service(session, username):
 
     data = {
