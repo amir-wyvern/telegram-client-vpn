@@ -63,6 +63,7 @@ class ManageUsersManager:
             ],
             [   
                 InlineKeyboardButton(loadStrings.callback_text.block_user, callback_data= 'blockuser'),
+                InlineKeyboardButton(loadStrings.callback_text.delete_user, callback_data= 'deleteuser'),
                 InlineKeyboardButton(loadStrings.callback_text.unblock_user, callback_data= 'unblockuser')
             ],
             [
