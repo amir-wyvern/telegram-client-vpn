@@ -17,7 +17,7 @@ from cache.cache_session import (
     set_msg_id
 )
 from utils.db_cache import db_cache
-from api.services import update_expire_ssh_service
+from api.services import update_expire_ssh_service, user_status_ssh_service
 from datetime import datetime, timedelta
 from persiantools.jdatetime import JalaliDateTime
 from methods.manage_users import ManageUsersManager
@@ -83,11 +83,52 @@ class UpdateExpireConfigManager:
         
         chat_id = update.effective_chat.id
 
-        text = update.message.text
+        username = update.message.text
+        
+        session = get_session(chat_id, db)
+        
+        resp = user_status_ssh_service(session, username)
+        
+        if resp.status_code != 200:
+            
+            if resp.status_code in [404, 409]:
+
+                if resp.json()['detail']['internal_code'] == 2433:
+                    message = loadStrings.text.error_username_not_have_service
+
+                inline_options = InlineKeyboardMarkup([
+                    [   
+                        InlineKeyboardButton(loadStrings.callback_text.support, url= loadStrings.callback_url.support),
+                        InlineKeyboardButton(loadStrings.callback_text.back, callback_data= 'manageusers')
+                    ]
+                ])
+
+                resp_msg = await context.bot.send_message(chat_id= chat_id, text= message, reply_markup= inline_options)
+                set_msg_id(chat_id, resp_msg.message_id, db)
+                return
+
+            else:
+        
+                inline_options = InlineKeyboardMarkup([
+                    [   
+                        InlineKeyboardButton(loadStrings.callback_text.support, url= loadStrings.callback_url.support),
+                        InlineKeyboardButton(loadStrings.callback_text.back, callback_data= 'manageusers')
+                    ]
+                ])
+
+                resp_msg = await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.internal_error, reply_markup= inline_options)
+                set_msg_id(chat_id, resp_msg.message_id, db)
+                return
+        
         set_position(chat_id, 'None', db)
         
+        old_expire = resp.json()['services'][0]['detail']['expire']
+        if '+' in old_expire:
+            old_expire = old_expire[:-6]
+
         cache = {
-            'username': text
+            'username': username,
+            'old_expire': old_expire
         }
         set_cache(chat_id, cache, db)
         await self.update_expire_set_date(update, context, db)
@@ -116,13 +157,20 @@ class UpdateExpireConfigManager:
             ]
         ])
 
-        date_day = JalaliDateTime.now(pytz.utc)
+        cache = get_cache(chat_id, db)
+        old_expire = cache['old_expire']
+
+        format_string = "%Y-%m-%dT%H:%M:%S"  # Replace with the format of your string
+        expire_date = datetime.strptime(old_expire, format_string)
+        jalali_old_expire = JalaliDateTime.fromtimestamp(expire_date.timestamp(), pytz.timezone("Asia/Tehran"))
 
         cache = get_cache(chat_id, db)
+        jalali_new_expire = jalali_old_expire
         if 'number_day' in cache:
-            date_day =  date_day + timedelta(days=cache['number_day'])
+            jalali_new_expire =  jalali_old_expire + timedelta(days=cache['number_day'])
 
-        text_day = loadStrings.text.expire_day_text.format(date_day.strftime("%Y/%m/%d"))
+        text_day = loadStrings.text.expire_day_text.format(jalali_old_expire.strftime("%Y/%m/%d"), jalali_new_expire.strftime("%Y/%m/%d") )
+
         resp_msg = await context.bot.send_message(chat_id= chat_id, text= text_day, reply_markup= inline_options)
         set_msg_id(chat_id, resp_msg.message_id, db)
 
@@ -130,6 +178,40 @@ class UpdateExpireConfigManager:
 
         chat_id = update.effective_chat.id
         query = update.callback_query
+
+        day_dict = {
+            'updateexpire_decrease_expire_day_1': -1,
+            'updateexpire_increase_expire_day_1': 1,
+            'updateexpire_decrease_expire_day_10': -10,
+            'updateexpire_increase_expire_day_10': 10,
+            'updateexpire_decrease_expire_day_30': -30,
+            'updateexpire_increase_expire_day_30': 30
+        }
+        cache = get_cache(chat_id, db)
+        old_expire = cache['old_expire']
+
+        format_string = "%Y-%m-%dT%H:%M:%S"  # Replace with the format of your string
+        expire_date = datetime.strptime(old_expire, format_string)
+        jalali_old_expire = JalaliDateTime.fromtimestamp(expire_date.timestamp(), pytz.timezone("Asia/Tehran"))
+
+        cache = get_cache(chat_id, db)
+        jalali_new_expire = jalali_old_expire
+
+        number_day = day_dict[query.data]
+        jalali_new_expire = jalali_new_expire + timedelta(days= number_day)
+        
+        if 'number_day' in cache:
+            number_day += cache['number_day']
+            jalali_new_expire = jalali_old_expire + timedelta(days=number_day)
+        
+        if jalali_new_expire.timestamp() <= JalaliDateTime.now(pytz.timezone("Asia/Tehran")).timestamp() :
+            await query.answer(loadStrings.text.invalid_expire)
+            return
+
+        cache['number_day'] = number_day
+        set_cache(chat_id, cache, db)
+
+        text_day = loadStrings.text.expire_day_text.format(jalali_old_expire.strftime("%Y/%m/%d"), jalali_new_expire.strftime("%Y/%m/%d"))
 
         inline_options = InlineKeyboardMarkup([
             [   
@@ -151,31 +233,6 @@ class UpdateExpireConfigManager:
             ]
         ])
 
-        day_dict = {
-            'updateexpire_decrease_expire_day_1': -1,
-            'updateexpire_increase_expire_day_1': 1,
-            'updateexpire_decrease_expire_day_10': -10,
-            'updateexpire_increase_expire_day_10': 10,
-            'updateexpire_decrease_expire_day_30': -30,
-            'updateexpire_increase_expire_day_30': 30
-        }
-        date_day = JalaliDateTime.now(pytz.utc)
-
-        cache = get_cache(chat_id, db)
-
-        number_day = day_dict[query.data]
-
-        date_day = date_day + timedelta(days= number_day)
-        
-        if 'number_day' in cache:
-            number_day += cache['number_day']
-            date_day =  date_day + timedelta(days=cache['number_day'])
-
-        cache['number_day'] = number_day
-        set_cache(chat_id, cache, db)
-
-        text_day = loadStrings.text.expire_day_text.format(date_day.strftime("%Y/%m/%d"))
-
         await update.callback_query.edit_message_text( text_day, reply_markup= inline_options)
 
     async def update_expire_submit(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db):
@@ -192,7 +249,11 @@ class UpdateExpireConfigManager:
             return
         
         await query.message.delete()
-        new_expire = datetime.now() + timedelta(days= cache['number_day'])
+        cache = get_cache(chat_id, db)
+        format_string = "%Y-%m-%dT%H:%M:%S" 
+        old_expire = datetime.strptime(cache['old_expire'], format_string) 
+        
+        new_expire = old_expire + timedelta(days= cache['number_day'])
         username = cache['username']
         resp = update_expire_ssh_service(session, username, new_expire.strftime('%Y-%m-%dT%H:%M:%S'))
 
@@ -243,12 +304,13 @@ class UpdateExpireConfigManager:
                 set_msg_id(chat_id, resp_msg.message_id, db)
                 return
 
-        delete_cache(chat_id, db)
-        new_expire_jalali = (JalaliDateTime.now() + timedelta(days= cache['number_day']) ).strftime("%Y/%m/%d")
+        delete_cache(chat_id, db) 
+        format_string = "%Y-%m-%dT%H:%M:%S"  # Replace with the format of your string
+        jalali_new_expire = JalaliDateTime.fromtimestamp(new_expire.timestamp(), pytz.timezone("Asia/Tehran"))
+        jalali_old_expire = JalaliDateTime.fromtimestamp(old_expire.timestamp(), pytz.timezone("Asia/Tehran"))
 
-        message = loadStrings.text.update_expire_success.format(username, new_expire_jalali) 
-        resp_msg = await context.bot.send_message(chat_id= chat_id, text= message, parse_mode='markdown') 
-        set_msg_id(chat_id, resp_msg.message_id, db)
+        message = loadStrings.text.update_expire_success.format(username, jalali_old_expire.strftime("%Y/%m/%d"), jalali_new_expire.strftime("%Y/%m/%d")) 
+        await context.bot.send_message(chat_id= chat_id, text= message, parse_mode='markdown') 
         set_position(chat_id, 'manageusers', db)
         
         await ManageUsersManager().manager(update, context, edit= False) 
