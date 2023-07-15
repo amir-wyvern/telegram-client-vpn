@@ -94,9 +94,9 @@ class UpdateExpireConfigManager:
             if resp.status_code in [404, 409, 400]:
                 
                 message = loadStrings.text.internal_error
-                
-                if resp.json()['detail']['internal_code'] == 2433:
-                    message = loadStrings.text.error_username_not_have_service
+
+                if resp.json()['detail']['internal_code'] == 2419:
+                    message = loadStrings.text.error_not_agent
 
                 inline_options = InlineKeyboardMarkup([
                     [   
