@@ -76,7 +76,7 @@ class RenewConfigManager:
 
         if resp.status_code != 200:
             
-            if resp.status_code in [404, 409]:
+            if resp.status_code in [404, 409, 400]:
 
                 if resp.json()['detail']['internal_code'] == 2433:
                     message = loadStrings.text.error_username_not_have_service
