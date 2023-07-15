@@ -80,7 +80,7 @@ class UserStatusManager:
         
         if resp.status_code != 200:
             
-            if resp.status_code in [404, 409]:
+            if resp.status_code in [404, 409, 400]:
                 
                 message = loadStrings.text.internal_error
 
