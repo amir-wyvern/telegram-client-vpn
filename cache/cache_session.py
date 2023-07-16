@@ -32,6 +32,11 @@ def set_session(chat_id, session, db: redis.Redis):
     resp = db.hset(f'tel:agent:{chat_id}', 'session', session)
     return resp
 
+def del_session(chat_id, db: redis.Redis):
+
+    resp = db.hdel(f'tel:agent:{chat_id}', 'session')
+    return resp
+
 def get_session(chat_id, db: redis.Redis):
 
     session = db.hget(f'tel:agent:{chat_id}', 'session') 

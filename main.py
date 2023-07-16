@@ -8,6 +8,7 @@ from telegram.ext import (
 )
 
 from handlers.start_handler import start
+from handlers.command_handler import logout
 from dotenv import load_dotenv
 import os
 from pathlib import Path
@@ -27,6 +28,7 @@ if __name__ == '__main__':
     application = ApplicationBuilder().token(TOKEN_BOT).build()
     
     application.add_handler(CommandHandler('start', start))
+    application.add_handler(CommandHandler('logout', logout))
     application.add_handler(MessageHandler(filters.TEXT, message_handler))
     # application.add_handler(MessageHandler(filters.CONTACT, phonenumber_handler))
     application.add_handler(CallbackQueryHandler(callback_handler))
