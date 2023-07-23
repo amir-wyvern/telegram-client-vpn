@@ -280,12 +280,15 @@ class UpdateExpireConfigManager:
                 if resp.json()['detail']['internal_code'] == 2419:
                     message = loadStrings.text.error_not_agent
                 
+                if resp.json()['detail']['internal_code'] == 2426:
+                    message = loadStrings.text.error_interface_disable
+                
                 if resp.json()['detail']['internal_code'] == 1412:
                     message = loadStrings.text.insufficient_balance
                     inline_options = InlineKeyboardMarkup([
                         [   
                             InlineKeyboardButton(loadStrings.callback_text.financial, callback_data= 'financial'),
-                            InlineKeyboardButton(loadStrings.callback_text.back, callback_data= 'newconfig')
+                            InlineKeyboardButton(loadStrings.callback_text.back, callback_data= 'updateexpire')
                         ]
                     ])
 
