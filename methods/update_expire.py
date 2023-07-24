@@ -68,7 +68,18 @@ class UpdateExpireConfigManager:
 
         set_position(chat_id, 'updateexpire_get_username', db) 
 
-        await query.message.delete()
+        try:
+            await query.message.delete()
+
+        except:
+            inline_options = InlineKeyboardMarkup([
+                    [   
+                        InlineKeyboardButton(loadStrings.callback_text.support, url= loadStrings.callback_url.support)
+                    ]
+                ])
+            resp_msg = await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.error_delete_msg, reply_markup= inline_options)
+            set_msg_id(chat_id, resp_msg.message_id, db)
+            return 
 
         inline_options = InlineKeyboardMarkup(
                 [
@@ -250,7 +261,19 @@ class UpdateExpireConfigManager:
             await query.answer(loadStrings.text.empty_day_field)
             return
         
-        await query.message.delete()
+        try:
+            await query.message.delete()
+
+        except:
+            inline_options = InlineKeyboardMarkup([
+                    [   
+                        InlineKeyboardButton(loadStrings.callback_text.support, url= loadStrings.callback_url.support)
+                    ]
+                ])
+            resp_msg = await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.error_delete_msg, reply_markup= inline_options)
+            set_msg_id(chat_id, resp_msg.message_id, db)
+            return 
+        
         cache = get_cache(chat_id, db)
         format_string = "%Y-%m-%dT%H:%M:%S" 
         old_expire = datetime.strptime(cache['old_expire'], format_string) 

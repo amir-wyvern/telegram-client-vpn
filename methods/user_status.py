@@ -58,8 +58,19 @@ class UserStatusManager:
 
         set_position(chat_id, 'userstatus_get_username', db) 
 
-        await query.message.delete()
+        try:
+            await query.message.delete()
 
+        except:
+            inline_options = InlineKeyboardMarkup([
+                    [   
+                        InlineKeyboardButton(loadStrings.callback_text.support, url= loadStrings.callback_url.support)
+                    ]
+                ])
+            resp_msg = await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.error_delete_msg, reply_markup= inline_options)
+            set_msg_id(chat_id, resp_msg.message_id, db)
+            return 
+        
         inline_options = InlineKeyboardMarkup(
                 [
                     [InlineKeyboardButton(loadStrings.callback_text.back, callback_data= 'manageusers')]
@@ -151,6 +162,19 @@ class UserStatusManager:
         await ManageUsersManager().manager(update, context, edit= False)
     
     async def click(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db):
-        
+
+        chat_id = update.effective_chat.id
         query = update.callback_query
-        await query.message.delete()
+
+        try:
+            await query.message.delete()
+        
+        except:
+            inline_options = InlineKeyboardMarkup([
+                    [   
+                        InlineKeyboardButton(loadStrings.callback_text.support, url= loadStrings.callback_url.support)
+                    ]
+                ])
+            resp_msg = await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.error_delete_msg, reply_markup= inline_options)
+            set_msg_id(chat_id, resp_msg.message_id, db)
+            return 
