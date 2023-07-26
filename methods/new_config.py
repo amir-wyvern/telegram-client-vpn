@@ -265,6 +265,9 @@ class NewConfigManager:
 
         for line in sp_old_text[1:]:
             main_line, strike_line = line.split(' ')
+            if main_line == 'username:':
+                new_text.append(line)
+                continue
             new_text.append(f'{main_line} <s>{strike_line}</s>')
 
         join_text=  '\n'.join(new_text).strip()
