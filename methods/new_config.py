@@ -205,14 +205,18 @@ class NewConfigManager:
                 
                     message = loadStrings.text.internal_error
                 
+                    inline_options = InlineKeyboardMarkup([
+                        [   
+                            InlineKeyboardButton(loadStrings.callback_text.financial, callback_data= 'financial'),
+                            InlineKeyboardButton(loadStrings.callback_text.back, callback_data= 'newconfig')
+                        ]
+                    ])
+
                     if resp.json()['detail']['internal_code'] == 1412:
                         message = loadStrings.text.insufficient_balance
-                        inline_options = InlineKeyboardMarkup([
-                            [   
-                                InlineKeyboardButton(loadStrings.callback_text.financial, callback_data= 'financial'),
-                                InlineKeyboardButton(loadStrings.callback_text.back, callback_data= 'newconfig')
-                            ]
-                        ])
+
+                    if resp.json()['detail']['internal_code'] == 2450:
+                        message = loadStrings.text.error_no_server
 
                     resp_msg = await context.bot.send_message(chat_id= chat_id, text= message, reply_markup= inline_options)
                     set_msg_id(chat_id, resp_msg.message_id, db)

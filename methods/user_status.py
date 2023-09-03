@@ -131,13 +131,13 @@ class UserStatusManager:
             'deleted': 'حذف شده'
         }
 
-        host = resp.json()['services'][0]['detail']['host']
-        port = resp.json()['services'][0]['detail']['port']
-        username = resp.json()['services'][0]['detail']['username']
-        password = resp.json()['services'][0]['detail']['password']
-        created = resp.json()['services'][0]['detail']['created']
-        expire = resp.json()['services'][0]['detail']['expire']
-        status = status_dict[resp.json()['services'][0]['detail']['status']]
+        host = resp.json()[0]['domain_name']
+        port = resp.json()[0]['port']
+        username = resp.json()[0]['username']
+        password = resp.json()[0]['password']
+        created = resp.json()[0]['created']
+        expire = resp.json()[0]['expire']
+        status = status_dict[resp.json()[0]['status']]
 
         if '+' in created:
             created = created[:-6]

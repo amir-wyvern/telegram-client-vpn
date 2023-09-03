@@ -100,11 +100,8 @@ class RenewConfigManager:
                 if resp.json()['detail']['internal_code'] == 2419:
                     message = loadStrings.text.error_not_agent
 
-                if resp.json()['detail']['internal_code'] == 2435:
-                    message = loadStrings.text.error_not_exist_any_interface
-
-                if resp.json()['detail']['internal_code'] == 2436:
-                    message = loadStrings.text.error_not_exist_any_interface
+                if resp.json()['detail']['internal_code'] == 2450:
+                    message = loadStrings.text.error_no_server
 
                 inline_options = InlineKeyboardMarkup([
                     [   

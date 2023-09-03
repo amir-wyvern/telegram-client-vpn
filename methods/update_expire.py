@@ -109,6 +109,9 @@ class UpdateExpireConfigManager:
                 if resp.json()['detail']['internal_code'] == 2419:
                     message = loadStrings.text.error_not_agent
 
+                if resp.json()['detail']['internal_code'] == 2433:
+                    message = loadStrings.text.error_username_not_have_service
+
                 inline_options = InlineKeyboardMarkup([
                     [   
                         InlineKeyboardButton(loadStrings.callback_text.support, url= loadStrings.callback_url.support),
