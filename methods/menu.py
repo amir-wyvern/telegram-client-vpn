@@ -61,6 +61,7 @@ class MenuManager:
 
         inline_options = InlineKeyboardMarkup([
             [InlineKeyboardButton(loadStrings.callback_text.new_config, callback_data= 'newconfig')],
+            [InlineKeyboardButton(loadStrings.callback_text.test_config_key, callback_data= 'testconfig')],
             [InlineKeyboardButton(loadStrings.callback_text.manage_users, callback_data= 'manageusers')],
             [   
                 InlineKeyboardButton(loadStrings.callback_text.support, url= loadStrings.callback_url.support),
