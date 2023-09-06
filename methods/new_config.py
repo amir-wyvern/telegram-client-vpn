@@ -22,7 +22,7 @@ from methods.menu import MenuManager
 class NewConfigManager:
 
     @db_cache
-    async def manager(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db, backward= False):
+    async def manager(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db):
         """
             manager requests this methods 
         """
