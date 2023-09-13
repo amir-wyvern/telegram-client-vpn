@@ -60,9 +60,12 @@ class MenuManager:
         set_position(chat_id, 'mainmenu', db)
 
         inline_options = InlineKeyboardMarkup([
-            [InlineKeyboardButton(loadStrings.callback_text.new_config, callback_data= 'newconfig')],
-            [InlineKeyboardButton(loadStrings.callback_text.test_config_key, callback_data= 'testconfig')],
+            [
+                InlineKeyboardButton(loadStrings.callback_text.new_config, callback_data= 'newconfig'),
+                InlineKeyboardButton(loadStrings.callback_text.test_config_key, callback_data= 'testconfig')
+            ],
             [InlineKeyboardButton(loadStrings.callback_text.manage_users, callback_data= 'manageusers')],
+            [InlineKeyboardButton(loadStrings.callback_text.profile_key, callback_data= 'profile')],
             [   
                 InlineKeyboardButton(loadStrings.callback_text.support, url= loadStrings.callback_url.support),
                 InlineKeyboardButton(loadStrings.callback_text.financial, callback_data= 'financial')
