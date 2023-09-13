@@ -17,6 +17,7 @@ from methods.help import HelpManager
 from methods.financial import FinancialManager
 from methods.test_config import TestConfigManager
 from methods.delete_user import DeleteUserManager
+from methods.profile import ProfileManager
 
 
 newConfigManager = NewConfigManager()
@@ -32,6 +33,7 @@ help = HelpManager()
 financial = FinancialManager()
 deleteUser = DeleteUserManager()
 testConfig = TestConfigManager()
+profile = ProfileManager()
 
 @db_cache
 async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, db):
@@ -53,6 +55,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, d
         'deleteuser': lambda: deleteUser.manager(update, context, edit=True),
         'unblockuser': lambda: unblockUser.manager(update, context, edit=True),
         'financial': lambda: financial.manager(update, context, edit=True),
+        'profile': lambda: profile.manager(update, context, edit=True),
         'help': lambda: help.manager(update, context, edit=True)
     }
     
