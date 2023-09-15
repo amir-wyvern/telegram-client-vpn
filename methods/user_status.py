@@ -128,7 +128,8 @@ class UserStatusManager:
         status_dict = {
             'enable': 'فعال',
             'disable': 'غیرفعال',
-            'deleted': 'حذف شده'
+            'expired': 'منقضی شده',
+            'deleted': 'حذف شده',
         }
 
         host = resp.json()[0]['domain_name']
