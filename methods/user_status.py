@@ -141,7 +141,7 @@ class UserStatusManager:
         status = status_dict[resp.json()['result'][0]['status']]
 
         srevice_type = 'Main'
-        if resp.json()[0]['service_type'] == 'TEST':
+        if resp.json()['result'][0]['service_type'] == 'TEST':
             srevice_type = 'Test'
 
         if '+' in created:
