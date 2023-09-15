@@ -132,13 +132,13 @@ class UserStatusManager:
             'deleted': 'حذف شده',
         }
 
-        host = resp.json()[0]['domain_name']
-        port = resp.json()[0]['ssh_port']
-        username = resp.json()[0]['username']
-        password = resp.json()[0]['password']
-        created = resp.json()[0]['created']
-        expire = resp.json()[0]['expire']
-        status = status_dict[resp.json()[0]['status']]
+        host = resp.json()['result'][0]['domain_name']
+        port = resp.json()['result'][0]['ssh_port']
+        username = resp.json()['result'][0]['username']
+        password = resp.json()['result'][0]['password']
+        created = resp.json()['result'][0]['created']
+        expire = resp.json()['result'][0]['expire']
+        status = status_dict[resp.json()['result'][0]['status']]
 
         srevice_type = 'Main'
         if resp.json()[0]['service_type'] == 'TEST':

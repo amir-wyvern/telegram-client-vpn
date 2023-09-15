@@ -138,7 +138,7 @@ class UpdateExpireConfigManager:
         
         set_position(chat_id, 'None', db)
         
-        old_expire = resp.json()[0]['expire']
+        old_expire = resp.json()['result'][0]['expire']
         if '+' in old_expire:
             old_expire = old_expire[:-6]
 
