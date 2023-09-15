@@ -22,6 +22,8 @@ load_dotenv(dotenv_path=dotenv_path)
 
 TOKEN_BOT = os.getenv('BOT_TOKEN')
 
+root_logger = logging.getLogger()
+root_logger.handlers.clear()
 
 if __name__ == '__main__':
 

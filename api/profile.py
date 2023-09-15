@@ -33,3 +33,19 @@ def claim_profit_via_wallet(session, value):
     return resp
 
 
+def set_chat_id(session, chat_id):
+    data = {
+        'new_chat_id': chat_id
+    }
+    resp = None
+    for _ in range(2):
+        try:
+            resp = requests.put(URL + 'agent/chat_id', json= data, headers= _header(session))
+            if resp.status_code == 200:
+                break
+            
+        except:
+            pass
+
+    return resp 
+

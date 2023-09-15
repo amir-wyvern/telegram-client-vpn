@@ -14,7 +14,24 @@ from cache.cache_session import (
 from utils.db_cache import db_cache
 from utils.msg_delete import msg_delete_all
 from api.auth import login
+from api.profile import set_chat_id
 from methods.menu import MenuManager
+import logging
+
+logger = logging.getLogger('login_method.log') 
+logger.setLevel(logging.INFO)
+
+file_handler = logging.FileHandler('login_method.log') 
+file_handler.setLevel(logging.INFO) 
+formatter = logging.Formatter('%(asctime)s - %(levelname)s | %(message)s') 
+file_handler.setFormatter(formatter) 
+logger.addHandler(file_handler) 
+
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s | %(message)s')
+console_handler.setFormatter(formatter)
+logger.addHandler(console_handler)
 
 
 class LoginManager:
@@ -151,7 +168,12 @@ class LoginManager:
         
         set_session(chat_id, resp.json()['access_token'], db)
 
-        await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.inital_msg)
+        set_chat_id(resp.json()['access_token'], chat_id= chat_id)
+
+        resp_msg = await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.inital_msg)
+
+        username = cache['username']
+        logger.info(f'login msg_id [username: {username} -msg_id: {resp_msg.message_id}]')
         # link to main menu
 
         await MenuManager().manager(update, context)
