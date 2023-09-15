@@ -1,8 +1,5 @@
 from telegram.ext import ContextTypes
 from telegram import Update
-import requests
-from utils.auth import auth
-from lang import loadStrings
 from utils.db_cache import db_cache
 from methods.new_config import NewConfigManager
 from methods.login import LoginManager
@@ -18,6 +15,7 @@ from methods.financial import FinancialManager
 from methods.test_config import TestConfigManager
 from methods.delete_user import DeleteUserManager
 from methods.profile import ProfileManager
+from methods.notification import NotificationManager
 
 
 newConfigManager = NewConfigManager()
@@ -34,6 +32,7 @@ financial = FinancialManager()
 deleteUser = DeleteUserManager()
 testConfig = TestConfigManager()
 profile = ProfileManager()
+notification = NotificationManager()
 
 @db_cache
 async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, db):
@@ -56,6 +55,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, d
         'unblockuser': lambda: unblockUser.manager(update, context, edit=True),
         'financial': lambda: financial.manager(update, context, edit=True),
         'profile': lambda: profile.manager(update, context, edit=True),
+        'notif': lambda: notification.manager(update, context, edit=True),
         'help': lambda: help.manager(update, context, edit=True)
     }
     

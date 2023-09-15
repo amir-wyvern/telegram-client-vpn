@@ -120,7 +120,7 @@ def update_expire_ssh_service(session, username, expire):
     }
 
     for _ in range(2):
-        resp = requests.post(URL + 'agent/ssh/expire', json= data, headers= _header(session))
+        resp = requests.put(URL + 'agent/ssh/expire', json= data, headers= _header(session))
         if resp.status_code == 200:
             break
         

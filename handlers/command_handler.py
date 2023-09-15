@@ -5,7 +5,6 @@ from utils.auth import auth
 from utils.db_cache import db_cache
 from cache.cache_session import get_session, del_session
 from api.profile import get_profile
-from methods.menu import MenuManager
 from utils.msg_delete import msg_delete_all
 from lang import loadStrings
 

@@ -94,7 +94,9 @@ class ManageUsersManager:
             total_user= "***"
             enable_ssh_services= "***"
             disable_ssh_services= "***"
+            expired_ssh_services= "***"
             deleted_ssh_services= "***"
+            test_ssh_services= "***"
 
         else:
 
@@ -103,9 +105,11 @@ class ManageUsersManager:
             total_user= data['total_user']
             enable_ssh_services= data['enable_ssh_services']
             disable_ssh_services= data['disable_ssh_services']
+            expired_ssh_services= data['expired_ssh_services']
             deleted_ssh_services= data['deleted_ssh_services']
+            test_ssh_services= data['test_ssh_services']
         
-        text = loadStrings.text.usersmanager_menu.format(username, total_user, enable_ssh_services, disable_ssh_services, deleted_ssh_services)
+        text = loadStrings.text.usersmanager_menu.format(username, total_user, test_ssh_services, enable_ssh_services, disable_ssh_services, expired_ssh_services, deleted_ssh_services)
 
         if edit:
             await update.callback_query.edit_message_text( text, reply_markup= inline_options)

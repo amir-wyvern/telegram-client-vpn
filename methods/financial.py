@@ -7,8 +7,6 @@ from telegram.ext import ContextTypes
 from telegram import Update
 from lang import loadStrings
 from cache.cache_session import (
-    set_cache,
-    get_cache,
     get_session
 )
 from utils.db_cache import db_cache
@@ -62,7 +60,7 @@ class FinancialManager:
         else:
 
             data = resp.json()
-            balance= data['balance']
+            balance= round(float(data['balance']), 2)
 
         text= loadStrings.text.financial_detail.format(balance)
         await query.edit_message_text(text= text, reply_markup= inline_options)

@@ -8,6 +8,7 @@ from telegram import Update
 from lang import loadStrings
 from cache.cache_session import (
     set_position,
+    get_position,
     get_session,
     set_msg_id,
     delete_cache
@@ -23,13 +24,17 @@ class ProfileManager:
         """
             manager requests this methods 
         """
-
+        
         query = update.callback_query
         callback_pointer = {
             'profile': lambda: self.profile(update, context, db),
             'profile_profit_menu': lambda: self.profile_profit_menu(update, context, db),
             'profile_profit_via_wallet': lambda: self.get_profit_via_wallet(update, context, db),
-            'profile_profit_via_withdraw': lambda: self.profile_profit_via_withdraw(update, context, db),
+            'profile_profit_via_withdraw': lambda: self.get_profit_via_withdraw(update, context, db),
+        }
+
+        message_pointer = {
+            'profile': lambda : self.profile(update, context, db, edit=False)
         }
 
         if edit :
@@ -37,8 +42,14 @@ class ProfileManager:
             if query.data in callback_pointer: 
                 await callback_pointer[query.data]()
 
+        else:
+            chat_id = update.effective_chat.id
+            pos = get_position(chat_id, db)
 
-    async def profile(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db):
+            if pos in message_pointer:
+                await message_pointer[pos]()
+
+    async def profile(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db, edit=True):
         """
             show profile
         """
@@ -50,8 +61,10 @@ class ProfileManager:
 
         inline_options = InlineKeyboardMarkup([
             [
-                InlineKeyboardButton(loadStrings.callback_text.get_profit_text, callback_data= 'profile_profit_menu'),
-                InlineKeyboardButton(loadStrings.callback_text.back, callback_data= 'mainmenu')
+                InlineKeyboardButton(loadStrings.callback_text.get_profit_text, callback_data= 'profile_profit_menu')
+            ],
+            [
+                InlineKeyboardButton(loadStrings.callback_text.back, callback_data= 'mainmenu'),
             ]
         ])
 
@@ -77,8 +90,8 @@ class ProfileManager:
             referal_link= data['referal_link']
             percent_profit= "20 درصد"
             subset_limit= data['subset_number_limit']
-            not_released_profit= data['subset_not_released_profit']
-            total_profit= data['subset_total_profit']
+            not_released_profit= round(float(data['subset_not_released_profit']) ,2)
+            total_profit= round(float(data['subset_total_profit'] - not_released_profit), 2)
             subset_number_of_configs= data['subset_number_of_configs']
             subset_list= '* --- *'
 
@@ -86,7 +99,7 @@ class ProfileManager:
                 subset_list = data['subset_list'][0]
                 
                 if len(data['subset_list']) > 1:
-                    for agent in data['subset_list'][1]:
+                    for agent in data['subset_list'][1:]:
                         subset_list = f'{subset_list} | {agent}'
 
         text = loadStrings.text.profile_text.format(
@@ -100,8 +113,12 @@ class ProfileManager:
             subset_list
             )
 
-        await update.callback_query.edit_message_text( text, reply_markup= inline_options, parse_mode='MARKDOWN')
-
+        if edit:
+            await update.callback_query.edit_message_text( text, reply_markup= inline_options, parse_mode='MARKDOWN')
+        
+        else:
+            resp_msg = await context.bot.send_message(chat_id= chat_id, text= text, reply_markup= inline_options, parse_mode='MARKDOWN')
+            set_msg_id(chat_id, resp_msg.message_id, db)
 
     async def profile_profit_menu(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db):
         
@@ -117,22 +134,35 @@ class ProfileManager:
             ]
         ])
 
-        update.callback_query.edit_message_text(loadStrings.text.profit_menu, reply_markup= inline_options, parse_mode='MARKDOWN')
+        await update.callback_query.edit_message_text(loadStrings.text.profit_menu, reply_markup= inline_options, parse_mode='MARKDOWN')
 
 
     async def get_profit_via_wallet(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db):
         
         chat_id = update.effective_chat.id
+        query = update.callback_query
 
+        try:
+            await query.message.delete()
+
+        except:
+            inline_options = InlineKeyboardMarkup([
+                    [   
+                        InlineKeyboardButton(loadStrings.callback_text.support, url= loadStrings.callback_url.support)
+                    ]
+                ])
+            resp_msg = await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.error_delete_msg, reply_markup= inline_options)
+            set_msg_id(chat_id, resp_msg.message_id, db)
+            return 
+        
         session = get_session(chat_id, db)
-
         resp = get_profile(session)
 
         if resp.status_code != 200 :
             inline_options = InlineKeyboardMarkup([
                         [   
                             InlineKeyboardButton(loadStrings.callback_text.support, url= loadStrings.callback_url.support),
-                            InlineKeyboardButton(loadStrings.callback_text.back, callback_data= 'profile')
+                            InlineKeyboardButton(loadStrings.callback_text.back, callback_data= 'profile_profit_menu')
                         ]
                     ])
             resp_msg = await context.bot.send_message(chat_id= chat_id, text= loadStrings.text.internal_error, reply_markup= inline_options)
@@ -144,18 +174,24 @@ class ProfileManager:
         
         if resp.status_code != 200:
             
-            if resp.status_code in [409]:
+            if resp.status_code in [409, 401]:
                 
                 message = loadStrings.text.internal_error
 
                 if resp.json()['detail']['internal_code'] == 2464:
                     message = loadStrings.text.error_not_have_profit
 
+                if resp.json()['detail']['internal_code'] == 2465:
+                    message = loadStrings.text.error_not_have_profit
+
+                if resp.json()['detail']['internal_code'] == 2418:
+                    message = loadStrings.text.error_admin_not_access
+                
 
                 inline_options = InlineKeyboardMarkup([
                     [   
                         InlineKeyboardButton(loadStrings.callback_text.support, url= loadStrings.callback_url.support),
-                        InlineKeyboardButton(loadStrings.callback_text.back, callback_data= 'profile')
+                        InlineKeyboardButton(loadStrings.callback_text.back, callback_data= 'profile_profit_menu')
                     ]
                 ])
 
@@ -168,7 +204,7 @@ class ProfileManager:
                 inline_options = InlineKeyboardMarkup([
                     [   
                         InlineKeyboardButton(loadStrings.callback_text.support, url= loadStrings.callback_url.support),
-                        InlineKeyboardButton(loadStrings.callback_text.back, callback_data= 'profile')
+                        InlineKeyboardButton(loadStrings.callback_text.back, callback_data= 'profile_profit_menu')
                     ]
                 ])
 
@@ -176,8 +212,9 @@ class ProfileManager:
                 set_msg_id(chat_id, resp_msg.message_id, db)
                 return
 
-        success_text = loadStrings.text.claim_profit_success.format(value)
-        resp_msg = await context.bot.send_message(chat_id= chat_id, text= success_text, reply_markup= inline_options)
+        set_position(chat_id, 'profile', db)
+        success_text = loadStrings.text.claim_profit_success.format(round(float(value),2))
+        resp_msg = await context.bot.send_message(chat_id= chat_id, text= success_text, parse_mode='html')
         set_msg_id(chat_id, resp_msg.message_id, db)
 
         await ProfileManager().manager(update, context, edit= False)

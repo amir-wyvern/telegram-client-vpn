@@ -132,12 +132,16 @@ class UserStatusManager:
         }
 
         host = resp.json()[0]['domain_name']
-        port = resp.json()[0]['port']
+        port = resp.json()[0]['ssh_port']
         username = resp.json()[0]['username']
         password = resp.json()[0]['password']
         created = resp.json()[0]['created']
         expire = resp.json()[0]['expire']
         status = status_dict[resp.json()[0]['status']]
+
+        srevice_type = 'Main'
+        if resp.json()[0]['service_type'] == 'TEST':
+            srevice_type = 'Test'
 
         if '+' in created:
             created = created[:-6]
@@ -158,7 +162,7 @@ class UserStatusManager:
             ]
         ])
 
-        config_text = loadStrings.text.user_status_text.format(host, port, username, password, created, expire, status)
+        config_text = loadStrings.text.user_status_text.format(host, port, username, password, created, expire, status, srevice_type)
         await context.bot.send_message(chat_id= chat_id, text= config_text, parse_mode='markdown', reply_markup= inline_options)
         set_position(chat_id, 'manageusers', db)
     
