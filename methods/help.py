@@ -7,10 +7,12 @@ from telegram.ext import ContextTypes
 from telegram import Update
 from lang import loadStrings
 from utils.db_cache import db_cache
+from utils.auth import auth
 
 class HelpManager:
 
     @db_cache
+    @auth
     async def manager(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db, edit=True):
         """
             manager requests this methods 

@@ -14,6 +14,7 @@ from cache.cache_session import (
     set_msg_id
 )
 from utils.db_cache import db_cache
+from utils.auth import auth
 from api.services import buy_ssh_service
 from api.profile import get_profile
 from methods.menu import MenuManager
@@ -22,6 +23,7 @@ from methods.menu import MenuManager
 class NewConfigManager:
 
     @db_cache
+    @auth
     async def manager(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db):
         """
             manager requests this methods 

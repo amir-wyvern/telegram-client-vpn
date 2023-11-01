@@ -16,6 +16,22 @@ from methods.test_config import TestConfigManager
 from methods.delete_user import DeleteUserManager
 from methods.profile import ProfileManager
 from methods.notification import NotificationManager
+import logging
+
+logger = logging.getLogger('callback_handler.log') 
+logger.setLevel(logging.INFO)
+
+file_handler = logging.FileHandler('callback_handler.log') 
+file_handler.setLevel(logging.INFO) 
+formatter = logging.Formatter('%(asctime)s - %(levelname)s | %(message)s') 
+file_handler.setFormatter(formatter) 
+logger.addHandler(file_handler) 
+
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s | %(message)s')
+console_handler.setFormatter(formatter)
+logger.addHandler(console_handler)
 
 
 newConfigManager = NewConfigManager()
@@ -37,8 +53,8 @@ notification = NotificationManager()
 @db_cache
 async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, db):
     
-    query = update.callback_query
     
+    query = update.callback_query
     # Acknowledge the button click and send a response
 
     callback_poitner = {
@@ -75,3 +91,4 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE, d
 
     # if key in callback_pointer:
     #     await callback_pointer[key]()
+

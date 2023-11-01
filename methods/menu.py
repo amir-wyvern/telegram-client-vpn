@@ -13,12 +13,14 @@ from cache.cache_session import (
     set_position,
     get_session
 )
+from utils.auth import auth
 from utils.db_cache import db_cache
 from api.profile import get_profile
 
 class MenuManager:
 
     @db_cache
+    @auth
     async def manager(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db, edit= False):
         """
             manager requests this methods 

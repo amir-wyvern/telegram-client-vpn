@@ -13,12 +13,14 @@ from cache.cache_session import (
     set_msg_id
 )
 from utils.db_cache import db_cache
+from utils.auth import auth
 from api.services import renew_ssh_service
 from methods.manage_users import ManageUsersManager
 
 class RenewConfigManager:
 
     @db_cache
+    @auth
     async def manager(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db, edit=True):
         """
             manager requests this methods 

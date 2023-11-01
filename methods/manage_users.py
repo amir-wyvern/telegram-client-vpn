@@ -15,11 +15,13 @@ from cache.cache_session import (
 )
 from utils.db_cache import db_cache
 from api.profile import get_profile
+from utils.auth import auth
 
 class ManageUsersManager:
 
 
     @db_cache
+    @auth
     async def manager(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db, edit=True):
         """
             manager requests this methods 

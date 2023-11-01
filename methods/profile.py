@@ -14,12 +14,13 @@ from cache.cache_session import (
     delete_cache
 )
 from utils.db_cache import db_cache
+from utils.auth import auth
 from api.profile import get_profile, claim_profit_via_wallet
-
 
 class ProfileManager:
 
     @db_cache
+    @auth
     async def manager(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db, edit=True):
         """
             manager requests this methods 

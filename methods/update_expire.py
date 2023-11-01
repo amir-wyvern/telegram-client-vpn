@@ -17,6 +17,7 @@ from cache.cache_session import (
     set_msg_id
 )
 from utils.db_cache import db_cache
+from utils.auth import auth
 from api.services import update_expire_ssh_service, user_status_ssh_service
 from datetime import datetime, timedelta
 from persiantools.jdatetime import JalaliDateTime
@@ -27,6 +28,7 @@ import pytz
 class UpdateExpireConfigManager:
 
     @db_cache
+    @auth
     async def manager(self, update: Update, context: ContextTypes.DEFAULT_TYPE, db, edit=False):
         """
             manager requests this methods 
