@@ -8,11 +8,17 @@ def auth(func):
         if kwargs.get('db', None) is None:
             raise 'db decorator is not used'
         
-        session = get_session(args[1]._chat_id, kwargs['db'])
+        if hasattr(args[1], '_chat_id'):
+            chat_id = args[1]._chat_id
+        else:
+            chat_id = args[1].effective_chat.id
+
+        session = get_session(chat_id, kwargs['db'])
         if session is None:
-            set_position(args[1]._chat_id, 'login_manager', kwargs['db'])
+            set_position(chat_id, 'login_manager', kwargs['db'])
             await LoginManager().manager(*args)
             return
+
 
         result = await func(*args, **kwargs)
         return result
