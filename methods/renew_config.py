@@ -104,6 +104,10 @@ class RenewConfigManager:
 
                 if resp.json()['detail']['internal_code'] == 2450:
                     message = loadStrings.text.error_no_server
+                
+                if resp.json()['detail']['internal_code'] in [3406, 3403]:
+                    message = loadStrings.text.conflict_user
+
 
                 inline_options = InlineKeyboardMarkup([
                     [   
